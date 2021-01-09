@@ -1,8 +1,8 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">  
+    <img alt="Vue logo" src="../assets/img/logo.png">  
     <div>
-      {{gg}}
+      <button @click="showToast()">{{gg}}</button>
       </div>  
       <div class="center">
         <inputForm :onInput="onInp" :value="value"></inputForm>
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import inputForm from "../components/inputForm.vue"
+import inputForm from "../components/form/inputForm.vue"
 import { defineComponent,ref } from 'vue';
 
 
@@ -22,9 +22,15 @@ export default defineComponent({
   },
   setup() {   
   const gg=ref('home')
-    return {gg}
-  }
+   function showToast() {
+      console.log("123")
+    }
   
+    
+    return {gg,showToast}
+  }
+
+
 });
 </script>
 <style>
