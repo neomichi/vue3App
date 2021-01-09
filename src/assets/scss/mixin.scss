@@ -1,0 +1,44 @@
+@mixin baseToast {
+    text-align: center;  
+    border-radius: 3px;
+    color: white;
+    font-weight: 700;
+    -webkit-box-shadow: 0px 0px 12px -1px rgba(56, 56, 56, 1);
+    -moz-box-shadow: 0px 0px 12px -1px rgba(56, 56, 56, 1);
+    box-shadow: 0px 0px 12px -1px rgba(56, 56, 56, 1);
+    display: flex;
+   align-self: flex-end;
+   
+  }
+
+
+  @mixin resumeTitle { 
+    color: #c5c3c3;
+    width: 100%;
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  
+    
+  @mixin rotate($degrees) {    
+      -webkit-transform: rotate($degrees);
+      -moz-transform: rotate($degrees);
+      -o-transform: rotate($degrees);
+      -ms-transform: rotate($degrees);
+      transform: rotate($degrees);
+      transition-duration: 1.2s;    
+  }
+
+
+
+
+
+
+  // transition: width 2s, height 2s, background-color 2s, transform 2s;
+  // transition: width 2s, height 2s,  transform 2s;
+
+  // .fade-enter-active, .fade-leave-active {
+  //   transition: opacity 1.2s;
+  // }
+
