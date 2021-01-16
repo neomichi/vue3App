@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Auth.vue')
+    component: () => import(/* webpackChunkName: "Auth" */ '../views/Auth.vue')
   },
   {
     meta: { role: 0,title:'Регистрация',showInMenu:false  },
@@ -33,8 +33,17 @@ const routes: Array<RouteRecordRaw> = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Auth.vue')
-  }
+    component: () => import(/* webpackChunkName: "Auth" */ '../views/Auth.vue')
+  },
+  {
+    meta: { role: 3,title:'админ',showInMenu:false  },
+    path: '/admin',
+    name: 'admin',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "Auth" */ '../views/Admin.vue')
+  },
 ]
 
 const router = createRouter({
