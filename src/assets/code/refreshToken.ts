@@ -13,9 +13,8 @@ export const getToken=()=> {
   return result
 }
 
-export const setToken=(value:string):void=> {
-    
-  if (!Helper.stringIsNullOrEmpty(value)) store.setItem(key,value)
+export const setToken=(value:string|undefined):void=> {    
+  if (!Helper.stringIsNullOrEmpty(value)) store.setItem(key,value as string)
  
 }
 

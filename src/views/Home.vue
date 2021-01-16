@@ -4,25 +4,21 @@
     <div>
       <button @click="showToast()">{{gg}}</button>
       </div>  
-      <div class="center">
-        <inputForm :onInput="onInp" :value="value"></inputForm>
-      </div>
+   
   </div>
 </template>
 
 <script lang="ts">
-import inputForm from "../components/form/inputForm.vue"
-import { defineComponent,ref } from 'vue';
 
+import { defineComponent,ref } from 'vue';
+import {Toast} from "../assets/code/toast"
 
 export default defineComponent({
-  name: 'Home',
-  components:{
-    inputForm
-  },
+  name: 'Home', 
   setup() {   
   const gg=ref('home')
    function showToast() {
+      Toast.info("asd")
       console.log("123")
     }
   

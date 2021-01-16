@@ -20,5 +20,6 @@ components: {
 
 <style lang="scss">
 @import "./assets/scss/main";
+@import "toastr2/src/toastr"
 </style>
 

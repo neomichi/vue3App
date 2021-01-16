@@ -9,8 +9,9 @@ export enum UserRole {
 
 export class User {
 
-static GetRoleFromString=(str:string)=>{
+    public static GetRoleFromString=(str:string):number=>{
         const result=UserRole[str as keyof typeof UserRole] as number
         return result===undefined?UserRole.default:result
     }
 }
+

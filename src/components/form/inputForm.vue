@@ -1,9 +1,11 @@
 <template>
    <div class="group">
-    <input @input="onInput" placeholder=""  type="text" required />
+    <input @input="onInput" :placeholder="placeholder"   :type="type"  />
     <span class="highlight"></span>
     <span class="bar"></span>
     <label>{{ title }}</label>
+
+    <!-- :value=value -->
   </div>
 </template>
 <script lang="ts">
@@ -13,15 +15,21 @@ import { defineComponent,ref } from 'vue';
 export default defineComponent({
   props:{
     title:{type:String,default:""},
-    placeholder:{type:String,default:""},
+    id:{type:String,default:""},
+    name:{type:String,default:""},
+    value:{type:String},
+    type:{type:String,default:"text"},
+    placeholder:{type:String,default:""}
   },
   setup() {
-
     return {}
   }
 })
 </script>
-<style>
+<style lang="scss">
+@import '../../assets/scss/color.scss';
+
+ 
 .group {
   position: relative;
   margin-bottom: 45px;
@@ -55,7 +63,7 @@ label {
 /* active state */
 input:focus ~ label,
 input:valid ~ label {
-  top: -20px;
+  top: -16px;
   font-size: 14px;
   color: #5264ae;
 }
