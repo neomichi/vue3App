@@ -9,7 +9,7 @@ export class Toast {
        this.toastr.info(text)
     }
 
-    public static success(text:string) {
+    public static success(text:string) {       
         this.toastr.success(text)
     }
 
