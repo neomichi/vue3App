@@ -18,8 +18,16 @@ components: {
 })
 </script>
 
+
+
+
+
 <style lang="scss">
-@import "./assets/scss/main";
-@import "toastr2/src/toastr"
+@import "./assets/scss/main.scss";
+@import "toastr2/src/toastr";
+
 </style>
+
+
+
 
