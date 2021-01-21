@@ -1,39 +1,55 @@
 <template>
-  <footer class="footer page-footer">
+  <footer class="footer" id="footer">
+    <div class="footer__line" >
     <a class="footer_author" href="#">nikolay © {{ getYearNow }} </a>
-    <router-link
+     <router-link
       :to="{ name: 'admin' }"
       tag="a"
-      class="grey-text text-lighten-4 red admin-link"
-      v-if="getRole == 3"
-      >admin</router-link
-    >
+      class="footer_admin-link"
+      v-if="role == 3"
+      >admin</router-link> 
+    </div>
   </footer>
 </template>
 <script lang="ts" >
 import * as store from "./../store/index";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 export default {
   setup() {
-    console.log(store.default.getters)
+    const role=ref(store.default.getters.userRole)
+ 
     const getYearNow = new Date().getFullYear();
-    return { getYearNow };
+    return { getYearNow,role };
   },
 };
 </script>
 <style lang="scss">
 @import "../assets/scss/color.scss";
-.page-footer {
-  background-color: $header-footer-bg-color;
-}
-.footer {
+
+#footer {
+   background-color: $header-footer-bg-color;
   display: flex;
   justify-content: center;
   flex-direction: column;
+ 
   height: 48px;
   padding: 0 20px;
+ 
 }
+
+.footer__line {
+  display: flex;
+  justify-content:space-between;
+}
+
 .footer_author {
+   color: white;
+}
+
+.footer_admin-link {
   color: white;
+  padding: 0 10px;
+  background: red;
+ 
 }
 </style>
