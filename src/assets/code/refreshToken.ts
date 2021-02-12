@@ -4,7 +4,13 @@ import {Helper} from "./helper";
 const  store = window.localStorage;
 const key= "refreshToken"
   
-export const getToken=()=> {
+export  class RefreshToken  {
+ private static store = window.localStorage;
+ private static key= "refreshToken"
+
+
+
+ public static get=()=> {
   let result =store.getItem(key)
 
   if (Helper.stringIsNullOrEmpty(result)) {
@@ -13,11 +19,11 @@ export const getToken=()=> {
   return result
 }
 
-export const setToken=(value:string|undefined):void=> {    
+public static set=(value:string|undefined):void=> {   
   if (!Helper.stringIsNullOrEmpty(value)) store.setItem(key,value as string)
  
 }
 
-export const removeToken=()=>store.removeItem(key)
+public static remove=()=>store.removeItem(key)
 
-
+}

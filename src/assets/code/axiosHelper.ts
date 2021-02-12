@@ -4,13 +4,15 @@ import axios from "axios";
 import {  AxiosRequestConfig, Method } from "axios";
 
 
-const apiClient = axios.create({
-    baseURL: "http://localhost:5000/api",
-});
+// const apiClient = axios.create({
+//     baseURL: "http://localhost:5000/api",
+// });
 
 export class AxiosRepository {
     private  static apiClient = axios.create({
         baseURL: "http://localhost:5000/api",
+        headers: {'Content-Type': 'application/json'}
+        
     });
 
     constructor() { }
@@ -23,16 +25,17 @@ export class AxiosRepository {
     ) {
         const config: AxiosRequestConfig = {
             method: actionMethod,
-            headers: "",
+            headers:  {'Content-Type': 'application/json'},
             data: data,
         };
 
         if (!Helper.stringIsNullOrEmpty(AccessToken)) {
             config.headers = `Bearer ${AccessToken}`;
+
         }
 
         return new Promise(function(resolve, reject) {
-             apiClient(url, config)
+            AxiosRepository.apiClient(url, config)
                 //.get(url,cfg(AccessToken))
                 .then((response) => resolve(response))
                 .catch((error) => reject(error.response));

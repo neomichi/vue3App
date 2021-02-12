@@ -2,6 +2,10 @@
 @import "color.scss";
 @import "clear.scss";
 
+a:hover {
+  color: black;
+}
+
 
 html, body {
     height: 100%;
@@ -32,4 +36,12 @@ body {
     width: 100%;
   }
 
-  
+  .img100 {
+    min-width: 100%;
+    min-height: 100%;    
+  }
+
+
+  input[type="checkbox"] {
+    width:auto;
+  }

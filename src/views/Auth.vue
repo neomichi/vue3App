@@ -1,93 +1,238 @@
 <template>
   <div class="center">
     <div class="userform__container">
-      <form action="" id="auth" class="userform" @submit.prevent="FormResult">
+      <form  id="auth" class="userform" @submit.prevent="formResult">
+
+
         <div class="userform__header">{{ formTitle }}</div>
         <div class="userform__body">
+         
           <div class="userform__input field">
-            <label class="label" for="email">email</label>
-            <input type="email" name="email" id="email" class="input" />
+            <div class="userform__input__icon">*</div>
+            <label class="userform-label" for="email">email</label>
+            <p class="control has-icons-left">
+              <input
+                type="email"
+                v-model="userForm.email"
+                name="email"
+                id="email"
+                class="input"
+              />
+              <span class="icon is-small is-left">
+                <i class="fas fa-envelope"></i>
+              </span>
+            </p>
           </div>
           <div class="userform__input field">
-            <label class="label" for="password">пароль</label>
-            <input type="password" name="password" id="password" class="input" />
+            <div class="userform__input__icon">*</div>
+            <label class="userform-label" for="password">пароль</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              class="input"
+              v-model="userForm.password"
+            />
           </div>
-        
+          <div v-if="routeName == 'register'" class="userform__input field">
+            <div class="userform__input__icon">*</div>
+            <label class="userform-label" for="repassword">повторить пароль</label>
+            <input
+              type="password"
+              name="repassword"
+              id="repassword"
+              class="input"
+              v-model="userForm.repassword"
+            />
+          </div>
+          <div class="userform__input field ">
+            <div class="userform__checkbox__icon">*</div>
+            <label class="checkbox">
+              <input v-model="userForm.isAgree" type="checkbox" />
+              Я соглашаюсь с <a href="#">terms and conditions</a>
+            </label>
+          </div>
         </div>
-        <div class="userform__button">
-          <button class="button is-active">войти</button>
+        <div class="userform__button">   
+            
+         {{routeNameUpdate()}}
+          <button v-if="isLoginPage"  class="button is-active">
+            войти
+          </button>
+          <button v-if="!isLoginPage" class="button is-active">
+            регистрация
+          </button>
+          <i class="fa fa-sign-in" aria-hidden="true"></i>
+        </div>
+        <div class="userform__about">
+         <p v-if="isLoginPage">У вас нет аккаунта,  <router-link :to="{name:'register'}"  tag="a"> регистрация</router-link> </p>
+          <p v-if="!isLoginPage">У вас есть аккаунт,  <router-link :to="{name:'login'}"  tag="a"> войти </router-link> </p> 
         </div>
       </form>
     </div>
   </div>
 </template>
 <script lang="ts">
-import inputForm from "../components/form/input4Form.vue";
 import route from "../router/index";
 import store from "../store/index";
 
-import { defineComponent, ref, reactive, computed } from "vue";
-import { LoginAuth } from "@/assets/code/types";
-import { useForm } from "../assets/code/formValidator/form";
-import * as gg from "ts-form-validation";
+import { defineComponent, ref, reactive, computed,onMounted } from "vue";
+import { Toast } from "../assets/code/toast";
+import { AxiosRepository } from "@/assets/code/axiosHelper";
+import { AxiosResponse } from "axios";
+import { ResponseToken } from "../assets/code/types";
+import { Helper } from "@/assets/code/helper";
+
+
+
 export default defineComponent({
-  components: {
-    inputForm,
-  },
   setup() {
-    const routeName = route.currentRoute.value.name;
-    function onYourEvent(e: any, ev: any) {
-      console.log(e);
-      console.log(ev);
+     onMounted(() => {
+      
+      console.log("auth Mounted");
+    })
+    //  const form =useForm({
+    //     email: {
+    //       value:'my@mail.ru',
+    //       validators: {required}
+    //     },
+    //     password: {
+    //       value:'qwe123ru',
+    //       validators: {required,minLenght:minLength(8)}
+    //     },
+    //     isAgree: {
+    //       value:false,
+    //       validators: {required}
+    //     }
+
+    //  })
+
+    
+    const isLoginPage=ref(false)
+
+    let routeName = ref(route.currentRoute.value.name)
+    
+    function routeNameUpdate() {
+      if(route.currentRoute.value.name === "login") isLoginPage.value=true;
+      if(route.currentRoute.value.name === "register") isLoginPage.value=false;
+       routeName.value=route.currentRoute.value.name; ///костыль 
+    }
+    const formTitle=ref(computed(() => isLoginPage.value?"Войти":"Регистрация"))
+    
+    const userForm = reactive({
+      email: "admin@test.ru1",
+      password: "LikeMe123!",
+      saveToLong: true,
+      repassword: "",
+      isAgree: true,
+    });  
+    function formResult() {      
+      return isLoginPage?LoginResult():RegisterResult()
     }
 
-    const formTitle = computed(() => {
-      if (routeName === "login") return "Войти";
-      if (routeName === "register") return "Регистрация";
-    });
-    const resultValues = ref({
-      email: "",
-      password: "",
-    });
-    function udpdate(ef: any) {
-      console.log(ef);
-    }
-    const FormResult = (ef: any) => {};
 
-    return { formTitle, FormResult, resultValues, udpdate };
+    const RegisterResult=()=> {
+      AxiosRepository.Post("/account", userForm, "")
+        .then((response) => {
+          const state = response as AxiosResponse;
+          try {
+            const accessToken:string = state.data.access_token;
+            const refreshToken:string= state.data.refresh_token;
+
+            if (
+              !Helper.stringIsNullOrEmpty(accessToken) &&
+              !Helper.stringIsNullOrEmpty(refreshToken)
+            ) {       
+                    
+              store.commit("updateToken", { accessToken, refreshToken });
+            } else throw new Error('Something bad create');
+          } catch {
+            
+            Toast.warning("Вы yказали неверный данные");
+          }
+        })
+        .catch(() => Toast.error("Ошибка")); 
+    }
+
+    const LoginResult = () => {
+      AxiosRepository.Post("/token", userForm, "")
+        .then((response) => {
+          const state = response as AxiosResponse;
+          try {
+            const accessToken:string = state.data.access_token;
+            const refreshToken:string= state.data.refresh_token;
+
+            if (
+              !Helper.stringIsNullOrEmpty(accessToken) &&
+              !Helper.stringIsNullOrEmpty(refreshToken)
+            ) {       
+                    
+              store.commit("updateToken", { accessToken, refreshToken });
+            } else throw new Error('Something went wrong :(')
+          } catch {
+            
+            Toast.warning("Вы yказали неверный данные");
+          }
+        })
+        .catch(() => Toast.error("Ошибка"));      
+    };
+
+    return { formTitle, formResult,  routeName,userForm,routeNameUpdate,isLoginPage };
   },
 });
 </script>
 <style lang="scss">
 .userform {
   padding: 20px 30px;
-  width: 400px;
- -webkit-box-shadow: 0px 0px 29px 7px rgba(174, 174, 174, 0.5);
--moz-box-shadow: 0px 0px 29px 7px rgba(174, 174, 174, 0.5);
-box-shadow: 0px 0px 29px 7px rgba(174, 174, 174, 0.5);
+
+  -webkit-box-shadow: 0px 0px 29px 7px rgba(174, 174, 174, 0.5);
+  -moz-box-shadow: 0px 0px 29px 7px rgba(174, 174, 174, 0.5);
+  box-shadow: 0px 0px 29px 7px rgba(174, 174, 174, 0.5);
   border: 1px solid rgb(190, 190, 190);
   border-radius: 5px;
+  &-label {
+    color: #363636;
+    display: block;
+    font-size: 1rem;
+  }
+
   &__body {
     padding: 10px 0;
   }
   &__input {
-    padding: 5px 0;
+    padding-top: 5px;
+    position: relative;
+    &__icon {
+      position: absolute;
+      top: 10px;
+      right: 0px;
+      color: red;
+    }
+  }
+  &__checkbox {
+    position: relative;
+    width: 0;
+    &__icon {
+      position: absolute;
+      top: 2px;
+      right: 0px;
+      color: red;
+    }
   }
   &__container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
- 
-   
-
-    
   }
   &__header {
     text-align: center;
     padding: 10px 0;
-    border-bottom: 1px solid rgb(207, 204, 204)
+    border-bottom: 1px solid rgb(207, 204, 204);
   }
- 
+  &__button {
+    text-align: center;
+    padding: 20px 0;
+  }
 }
 </style>

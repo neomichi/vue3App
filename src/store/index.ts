@@ -1,35 +1,36 @@
 import { createStore } from "vuex";
 import { Helper } from "../assets/code/helper";
-import * as refresh from "../assets/code/refreshToken";
+import {RefreshToken} from "../assets/code/refreshToken";
 import axios from "axios";
 import { ResponseToken } from "@/assets/code/types";
  import {Toast} from "../assets/code/toast"
 
 export default createStore({
   state: {
-    actionToken: "",
+    accessToken: "",
     user: {},
   },
   getters: {
-    userRole: (state) => Helper.objectKeyValue(state.user, "role"),
+    userRole: (state) => Helper.userRole(state.user, "role"),
 
-    tokenIsEmpty: (state) => Helper.stringIsNullOrEmpty(state.actionToken),
+    tokenIsEmpty: (state) => Helper.stringIsNullOrEmpty(state.accessToken),
     userIsEmpty: (state) => Helper.objectIsNullOrEmpty(state.user),
   },
   mutations: {
     setLoader(state, obj) {
       //state.showLoad = obj;
     },
-    updateToken(state, obj:ResponseToken) {
-      refresh.setToken(obj.refreshToken);
-      state.actionToken = obj.accessToken as string;
+    updateToken(state, obj:ResponseToken) {      
+      RefreshToken.set(obj.refreshToken);
+      state.accessToken = obj.accessToken;
+      
     },
     setUser(state, obj) {
       state.user = obj;
     },
     logout(state) {
-      refresh.setToken("");
-      state.actionToken="";
+      RefreshToken.set("");
+      state.accessToken="";
       state.user = {};
     },
   },
@@ -84,20 +85,7 @@ export default createStore({
       if (showToast) Toast.info("Вы вышли из аккаунта ");
       commit("logout");
     },
-    async refresh({ commit }, obj) {
-      const result = await axios({
-        method: "post",
-        url: "http://localhost:5000/api/token/refreshToken",
-        data: obj,
-      });
  
-      console.log("store refresh");
-      const ResponseToken = {
-        accessToken: result.data.access_token,
-        refreshToken: result.data.refresh_token,
-      };
-      commit("updateToken", ResponseToken);
-    },
 
     async SendFileToBack(aa, query) {
       try {
