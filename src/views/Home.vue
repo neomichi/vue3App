@@ -1,36 +1,26 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/img/logo.png">  
+    <img alt="Vue logo" src="../assets/img/logo.png" />
     <div>
-      <button class="button is-outlined" @click="showToast()">{{gg}}</button>
-      </div>  
-       
+      <button class="button is-outlined" @click="showToast()"></button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-
-import { defineComponent,ref } from 'vue';
-import ffff from "../components/form/input3Form.vue"
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
-  name: 'Home', 
-  components: {
-      ffff
-  },
-  setup() {   
-  const gg=ref('home')
-   function showToast() {
+  name: "Home",
 
-      console.log("123")
+  setup() {
+    function showToast() {
+      console.log("123");
     }
-  
-    
-    return {gg,showToast}
+
+    return { showToast };
   }
-
-
-});
+})
 </script>
 <style>
 div.center {

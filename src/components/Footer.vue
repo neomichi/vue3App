@@ -6,17 +6,17 @@
       :to="{ name: 'admin' }"
       tag="a"
       class="footer_admin-link"
-      v-if="role == 3"
+      v-if="role == 30"
       >admin</router-link> 
     </div>
   </footer>
 </template>
 <script lang="ts" >
-import * as store from "./../store/index";
+import store from "./../store/index";
 import { ref, computed } from "vue";
 export default {
   setup() {
-    const role=ref(store.default.getters.userRole)
+    const role=ref(store.getters.userRole)
  
     const getYearNow = new Date().getFullYear();
     return { getYearNow,role };

@@ -1,6 +1,33 @@
 import { RouteRecordRaw } from 'vue-router';
-//токет с бек
-export interface ResponseToken {
+//токетXXX
+
+export interface IRole {
+  roles: string | undefined | null;
+}
+
+export interface IUserForm {
+  email: string,
+  password: string,
+  saveToLong: boolean,
+  repassword: string,
+  isAgree: boolean,
+}
+
+export interface ILoginForm {
+  email: string,
+  password: string,
+  saveToLong: boolean
+}
+
+export interface IRegisterForm {
+  email: string,
+  password: string,
+  repassword: string,
+  isAgree: boolean
+}
+
+
+export interface IResponseToken {
   accessToken:string 
   refreshToken:string 
 }
@@ -25,7 +52,7 @@ export  enum PageType {
 
 
 
-export interface loginForm {
+export interface IloginForm {
   email: "",
   password: "",
 

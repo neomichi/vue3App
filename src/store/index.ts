@@ -1,18 +1,26 @@
+
+import { User  } from '../assets/code/user';
 import { createStore } from "vuex";
 import { Helper } from "../assets/code/helper";
 import {RefreshToken} from "../assets/code/refreshToken";
 import axios from "axios";
-import { ResponseToken } from "@/assets/code/types";
- import {Toast} from "../assets/code/toast"
+import { IResponseToken } from "@/assets/code/types";
+import {Toast} from "../assets/code/toast"
+
+//  export const createStore = () => {
+//   const state = reactive({ counter: 0 });
+//   const increment = () => state.counter++;
+//   return { increment, state: readonly(state) };
+// }
+
 
 export default createStore({
-  state: {
+  state:  {
     accessToken: "",
-    user: {},
+    user: {}, 
   },
   getters: {
-    userRole: (state) => Helper.userRole(state.user, "role"),
-
+    userRole: (state) =>User.GetRole(state.user),
     tokenIsEmpty: (state) => Helper.stringIsNullOrEmpty(state.accessToken),
     userIsEmpty: (state) => Helper.objectIsNullOrEmpty(state.user),
   },
@@ -20,17 +28,18 @@ export default createStore({
     setLoader(state, obj) {
       //state.showLoad = obj;
     },
-    updateToken(state, obj:ResponseToken) {      
+    updateToken(state, obj:IResponseToken) {      
       RefreshToken.set(obj.refreshToken);
       state.accessToken = obj.accessToken;
       
     },
     setUser(state, obj) {
-      state.user = obj;
+      console.log(obj)
+      state.user = obj
     },
     logout(state) {
-      RefreshToken.set("");
-      state.accessToken="";
+      RefreshToken.set("")
+      state.accessToken=""
       state.user = {};
     },
   },
@@ -43,7 +52,7 @@ export default createStore({
           data: authData,
         });
         const result = await token.data;;;''
-        const newToken:ResponseToken = {
+        const newToken:IResponseToken = {
           accessToken: result.access_token,
           refreshToken: result.refresh_token,
           

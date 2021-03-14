@@ -13,19 +13,16 @@ import router from "./router/index";
 import store from "./store/index";
 import { AxiosResponse } from "axios";
 import { Toast } from "./assets/code/toast";
-import { RefreshToken} from "./assets/code/refreshToken";
-import { ResponseToken } from "./assets/code/types";
+import { RefreshToken } from "./assets/code/refreshToken";
+import { IResponseToken } from "./assets/code/types";
 import { RouteLocationNormalized } from "vue-router";
+import { User } from "./assets/code/user";
 
-import {
-  defineComponent,
-  ref,
-  onMounted,
-  onBeforeUpdate,
-  onUpdated,
-} from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { Helper } from "@/assets/code/helper";
-import * as axios from "@/assets/code/axiosHelper";
+import { AxiosRepository } from "@/assets/code/axiosHelper";
+import axios from "axios";
+import Toastr from "toastr2";
 
 export default defineComponent({
   components: {
@@ -33,19 +30,20 @@ export default defineComponent({
     Footer,
   },
   setup() {
-    function CheckRefreshToke() {
-      console.log("CheckAuthofication");
-      const refresh =RefreshToken.get();
+    function CheckRefreshToken() {
+      console.log("CheckRefreshToken");
+      const refresh = RefreshToken.get();
       if (!Helper.stringIsNullOrEmpty(refresh)) {
         const data = { refreshToken: refresh };
-        axios.AxiosRepository.Post("/token/refreshToken", data, "").then(
+        AxiosRepository.Post("/token/refreshToken", data, "").then(
           (response) => {
-            var responseToken = (response as AxiosResponse<ResponseToken>).data;
-
+            let responseToken = (response as AxiosResponse<IResponseToken>).data;
+             
             if (
               !Helper.stringIsNullOrEmpty(responseToken.accessToken) &&
               !Helper.stringIsNullOrEmpty(responseToken.refreshToken)
             ) {
+              User.GetUserFromToken(responseToken.accessToken);
               store.commit("updateToken", responseToken);
             }
           }
@@ -53,25 +51,36 @@ export default defineComponent({
       }
     }
     function UserRolePermissionCheck(to: RouteLocationNormalized) {
-      const role = store.getters.userRole;
+      const role =ref(store.getters.userRole)
       if (to.meta.role > role) {
-        Toast.warning("Нету прав")
+        Toast.warning("Недостаточно прав");
         router.push({ name: "login", query: { returnUrl: to.fullPath } });
       }
     }
+     function UpdateUserFromToken(isShow:boolean=false) {
+       const accessToken= store.state.accessToken
+            console.log(accessToken)
+       if (!Helper.stringIsNullOrEmpty(accessToken)) {
 
-    onUpdated(() => {
-      console.log("onUpdated");
-    });
+        AxiosRepository.Get("http://localhost:5000/api/account/",accessToken)
+        .then((response)=> {
+           const state = response as AxiosResponse;
+           if (!Helper.stringIsNullOrEmpty(state.data)) {
+              store.commit('setUser',state.data)
+                if (isShow)  Toast.success("Успешно")
+           }
+
+        })
+      }
+    }
     onMounted(() => {
-      // var a=store.state.accessToken;
       console.log("app Mounted");
+      CheckRefreshToken();
 
-      console.log(store.state.accessToken);
-      CheckRefreshToke();
-      router.beforeEach((to, from) => {
+      const guard = router.beforeEach((to, from) => {
         UserRolePermissionCheck(to);
       });
+
       console.log("end Mounted");
     });
 

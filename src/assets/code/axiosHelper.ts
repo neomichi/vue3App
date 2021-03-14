@@ -17,24 +17,31 @@ export class AxiosRepository {
 
     constructor() { }
 
-    private static Query(
+    private static async  Query (
         actionMethod: Method,
         url: string,
         data: any,
         AccessToken:string=""
     ) {
+        
         const config: AxiosRequestConfig = {
             method: actionMethod,
             headers:  {'Content-Type': 'application/json'},
             data: data,
         };
 
+      
+
         if (!Helper.stringIsNullOrEmpty(AccessToken)) {
-            config.headers = `Bearer ${AccessToken}`;
+            // {'Authorization': `Bearer ${AccessToken}`};
+            config.headers['Authorization']=`Bearer ${AccessToken}`
 
+           
+           
         }
-
-        return new Promise(function(resolve, reject) {
+   
+        return new Promise((resolve, reject)=> {
+            
             AxiosRepository.apiClient(url, config)
                 //.get(url,cfg(AccessToken))
                 .then((response) => resolve(response))
@@ -42,8 +49,9 @@ export class AxiosRepository {
         });
     }
     public static Get(url:string,accessToken="") {
+     
       const method:Method="get"
-
+     
       return this.Query(method,url,"",accessToken);       
     }
 
@@ -72,3 +80,5 @@ export class AxiosRepository {
 // res.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
 // res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 //header("Access-Control-Allow-Origin: *");
+
+

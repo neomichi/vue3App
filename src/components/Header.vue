@@ -26,32 +26,50 @@
         <div class="animation start-home"></div>
         <div class="nav__userlogo"></div>
       </ul>
+      {{userRole}}
     </div>
+
   </nav>
 </template>
 <script lang="ts">
-import routes from "./../router/index";
+import routes from "../router/index"
+import store from "../store/index"
+import { RouteRecordNormalized } from 'vue-router'
 
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref ,computed,watchEffect} from "vue";
 
 export default defineComponent({
   setup() {
     const routeName = "";
-    const isAuth = ref(false);
-    const userImg = ref("user.png");
-    const menuRoutes = routes
-      .getRoutes()
+    const userRole=
+    computed(()=>{
+       store.getters.userRole
+       console.log(`computed ${store.getters.userRole}`)
+    })
+  
+  
+    const userImg = ref("user.png");  
+    function  isAllowRoute(route:RouteRecordNormalized):boolean {
+     
+       return true
+     }  
+    const menuRoutes = routes      
+      .getRoutes()      
       .filter((route) => route.meta.showInMenu)
+      .filter((route)=>isAllowRoute(route))
       .map((route) => {
-        return {
+         return {
           name: route.name,
           path: route.path,
           title: route.meta.title,
         };
       });
-    return { menuRoutes, isAuth, userImg, routeName };
+    return { menuRoutes, userRole, userImg, routeName };
   },
 });
+
+
+
 </script>
 
 <style lang="scss">

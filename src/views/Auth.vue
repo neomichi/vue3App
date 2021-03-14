@@ -1,12 +1,13 @@
 <template>
   <div class="center">
+
     <div class="userform__container">
       <form  id="auth" class="userform" @submit.prevent="formResult">
 
-
+        
         <div class="userform__header">{{ formTitle }}</div>
         <div class="userform__body">
-         
+       
           <div class="userform__input field">
             <div class="userform__input__icon">*</div>
             <label class="userform-label" for="email">email</label>
@@ -57,7 +58,7 @@
             
          {{routeNameUpdate()}}
           <button v-if="isLoginPage"  class="button is-active">
-            войти
+            войти  
           </button>
           <button v-if="!isLoginPage" class="button is-active">
             регистрация
@@ -68,116 +69,113 @@
          <p v-if="isLoginPage">У вас нет аккаунта,  <router-link :to="{name:'register'}"  tag="a"> регистрация</router-link> </p>
           <p v-if="!isLoginPage">У вас есть аккаунт,  <router-link :to="{name:'login'}"  tag="a"> войти </router-link> </p> 
         </div>
+     
       </form>
     </div>
+
   </div>
 </template>
 <script lang="ts">
-import route from "../router/index";
-import store from "../store/index";
+import route from "../router/index"
+import store from "../store/index"
 
 import { defineComponent, ref, reactive, computed,onMounted } from "vue";
 import { Toast } from "../assets/code/toast";
 import { AxiosRepository } from "@/assets/code/axiosHelper";
 import { AxiosResponse } from "axios";
-import { ResponseToken } from "../assets/code/types";
+import { IUserForm, IResponseToken } from "../assets/code/types";
 import { Helper } from "@/assets/code/helper";
+import { User} from '@/assets/code/user'
 
 
 
 export default defineComponent({
   setup() {
-     onMounted(() => {
-      
+     onMounted(() => {      
       console.log("auth Mounted");
     })
-    //  const form =useForm({
-    //     email: {
-    //       value:'my@mail.ru',
-    //       validators: {required}
-    //     },
-    //     password: {
-    //       value:'qwe123ru',
-    //       validators: {required,minLenght:minLength(8)}
-    //     },
-    //     isAgree: {
-    //       value:false,
-    //       validators: {required}
-    //     }
+    computed(()=>{
+       store.getters.userRole.roles
+       console.log(`computed user ${store.getters.userRole}`)
+    })
+     const isLoginPage=ref(false)
 
-    //  })
-
+     let routeName = ref(route.currentRoute.value.name)
     
-    const isLoginPage=ref(false)
-
-    let routeName = ref(route.currentRoute.value.name)
+     function routeNameUpdate() {
+       if(route.currentRoute.value.name === "login") isLoginPage.value=true;
+       if(route.currentRoute.value.name === "register") isLoginPage.value=false;
+        routeName.value=route.currentRoute.value.name; ///костыль 
+     }
+     const formTitle=ref(computed(() => isLoginPage.value?"Войти":"Регистрация"))
     
-    function routeNameUpdate() {
-      if(route.currentRoute.value.name === "login") isLoginPage.value=true;
-      if(route.currentRoute.value.name === "register") isLoginPage.value=false;
-       routeName.value=route.currentRoute.value.name; ///костыль 
-    }
-    const formTitle=ref(computed(() => isLoginPage.value?"Войти":"Регистрация"))
-    
-    const userForm = reactive({
+    const userForm:IUserForm = reactive({
       email: "admin@test.ru1",
       password: "LikeMe123!",
       saveToLong: true,
       repassword: "",
       isAgree: true,
     });  
-    function formResult() {      
-      return isLoginPage?LoginResult():RegisterResult()
+
+    function formResult() {
+        if (isLoginPage.value) User.LoginResult(userForm);
+         else User.RegisterResult(userForm)
     }
+   
 
-
-    const RegisterResult=()=> {
-      AxiosRepository.Post("/account", userForm, "")
-        .then((response) => {
-          const state = response as AxiosResponse;
-          try {
-            const accessToken:string = state.data.access_token;
-            const refreshToken:string= state.data.refresh_token;
-
-            if (
-              !Helper.stringIsNullOrEmpty(accessToken) &&
-              !Helper.stringIsNullOrEmpty(refreshToken)
-            ) {       
-                    
-              store.commit("updateToken", { accessToken, refreshToken });
-            } else throw new Error('Something bad create');
-          } catch {
+    // const RegisterResult=()=> {
+    //   AxiosRepository.Post("/account", userForm, "")
+    //     .then((response) => {
+    //       const state = response as AxiosResponse;
+    //       try {
+    //         const accessToken:string = state.data.accessToken;
+    //         const refreshToken:string= state.data.refreshToken;
+    //         const responseToken=state.data as ResponseToken
+    //         if (
+    //           !Helper.stringIsNullOrEmpty(accessToken) &&
+    //           !Helper.stringIsNullOrEmpty(refreshToken)
+    //         ) {       
+                
+    //           store.commit("updateToken", { accessToken, refreshToken });
+    //           User.GetUserFromToken(accessToken,true)
+    //         } else throw new Error('Something bad create');
+    //       } catch {
             
-            Toast.warning("Вы yказали неверный данные");
-          }
-        })
-        .catch(() => Toast.error("Ошибка")); 
-    }
-
-    const LoginResult = () => {
-      AxiosRepository.Post("/token", userForm, "")
-        .then((response) => {
-          const state = response as AxiosResponse;
-          try {
-            const accessToken:string = state.data.access_token;
-            const refreshToken:string= state.data.refresh_token;
-
-            if (
-              !Helper.stringIsNullOrEmpty(accessToken) &&
-              !Helper.stringIsNullOrEmpty(refreshToken)
-            ) {       
-                    
-              store.commit("updateToken", { accessToken, refreshToken });
-            } else throw new Error('Something went wrong :(')
-          } catch {
+    //         Toast.warning("Вы yказали неверный данные");
             
-            Toast.warning("Вы yказали неверный данные");
-          }
-        })
-        .catch(() => Toast.error("Ошибка"));      
-    };
+    //       }
+    //     })
+    //     .catch(() => Toast.error("Ошибка")); 
+    // }
+  
+    // const LoginResult = () => {
+    //   AxiosRepository.Post("/token", userForm, "")
+    //     .then((response) => {
+    //       const axiosResponse = response as AxiosResponse;
+    //       try {
+    //         const accessToken:string = axiosResponse.data.accessToken;
+    //         const refreshToken:string= axiosResponse.data.refreshToken;
+       
+    //         if (
+    //           !Helper.stringIsNullOrEmpty(accessToken) &&
+    //           !Helper.stringIsNullOrEmpty(refreshToken)
+    //         ) {       
+                    
+    //           store.commit("updateToken", { accessToken, refreshToken });
+              
+    //           User.GetUserFromToken(accessToken,true)
+    //         } else throw new Error('Something went wrong :(')
+    //       } catch {
+            
+    //         Toast.warning("Вы yказали неверный данные");
+    //       }
+    //     })
+    //     .catch(() => Toast.error("Ошибка"));      
+    // };
+ 
 
-    return { formTitle, formResult,  routeName,userForm,routeNameUpdate,isLoginPage };
+
+    return {formResult, formTitle, routeName,userForm,routeNameUpdate,isLoginPage };
   },
 });
 </script>
