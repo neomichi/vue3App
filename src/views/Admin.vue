@@ -1,32 +1,41 @@
 <template>
   <div class="admin__base">
     <div class="admin">
-      <div class="admin__sidebar">asdads</div>
-      <div class="admin__body">vvvvvvvvv</div>
+      <div class="admin__header">header</div>
+      <div class="admin__sidebar">sidebar</div>
+      <div class="admin__main">body</div>
     </div>
   </div>
 </template>
+
+
+
 <style lang="scss">
 .admin {
-  display: flex;
-  justify-content: flex-start;
-  height:100%;
-  min-width:100%;
-     border: 1px solid #000000;
+  display: grid;
+  grid-template-columns: minmax(150px,300px ) 1fr;
+  grid-template-areas: "admin__header admin__header"
+                       "admin__sidebar admin__main"
 
-  &__sidebar {
-    height: 100%;
-    width: 220px;
+
+                       admin__header{grid-area: admin__header;}
+                       admin__sidebar{grid-area: admin__sidebar;}
+                       admin__main{grid-area: admin__main;}
+
+
+
+  &__header {
     border: 1px solid #000000;
   }
-  &__body {
-    
-    height: 100%;
+  &__sidebar {  
+    border: 1px solid #000000;
   }
-  &__base {
-    width: 100%;
-    min-height: 100%;
+  &__main {    
+    border: 1px solid #000000;
   }
+  // &__base {
+
+  // }
 }
 </style>
 <script lang="ts">

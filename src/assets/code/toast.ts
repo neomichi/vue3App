@@ -1,24 +1,26 @@
 import Toastr from 'toastr2';
 import 'toastr2/dist/toastr.min.css';
 
-export class Toast {
+class Toast {
 
-    public static readonly toastr:any = new Toastr();
+    public  readonly toastr:any = new Toastr();
 
-    public static info(text:string){
+    public  info(text:string){
        this.toastr.info(text)
     }
 
-    public static success(text:string) {       
+    public success(text:string) {       
         this.toastr.success(text)
     }
 
-    public static error(text:string) {
+    public error(text:string) {
         this.toastr.error(text)
     }
 
-    public static warning(text:string) {
+    public warning(text:string) {
         this.toastr.error(text)
     }    
 
 }
+
+export const toast=new Toast()

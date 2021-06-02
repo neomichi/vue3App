@@ -1,6 +1,6 @@
 <template>
   <div class="inputWithIcon">
-    <input @input="onInput" :value="value" :type="type" :class="classValue"  placeholder="Email"   />
+    <!-- <input @input="onInput" :value="value" :type="type" :class="classValue"  placeholder="Email"   /> -->
     <i ><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17" height="17" viewBox="0 0 17 17">
 <g>
 </g>
@@ -78,7 +78,10 @@ export default defineComponent({
   },
   setup() {
     
-    return {};
+    function onInput() {
+      console.log(1)
+    }
+    return {onInput}
   },
 });
 </script>

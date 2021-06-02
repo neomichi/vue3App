@@ -4,7 +4,7 @@
         <div class="column is-6 is-offset-3"> -->
           <div class="field">
             <div class="control is-relative">
-              <input  @input="onInput" :placeholder="placeholder" class="input ab-textinput" :type="type" required  />
+              <input   @input="onInput" :placeholder="placeholder" class="input ab-textinput" :type="type" required  />
               <label class="ab-label">{{title}}</label>
             </div>
           </div>
@@ -28,7 +28,10 @@ export default defineComponent({
     placeholder:{type:String,default:" "}
   },
   setup() {
-    return {}
+    function onInput() {
+      console.log(1)
+    }
+    return {onInput}
   }
 })
 </script>

@@ -7,18 +7,18 @@
       tag="a"
       class="footer_admin-link"
       v-if="role == 30"
-      >admin</router-link> 
+      >admin</router-link>
     </div>
   </footer>
 </template>
 <script lang="ts" >
-import store from "./../store/index";
-import { ref, computed } from "vue";
+import {authStore} from "../store/authStore"
+import { computed } from "vue"
 export default {
   setup() {
-    const role=ref(store.getters.userRole)
- 
-    const getYearNow = new Date().getFullYear();
+
+    const role=computed(()=>authStore.getUserRole())    
+    const getYearNow = new Date().getFullYear();    
     return { getYearNow,role };
   },
 };
@@ -39,7 +39,8 @@ export default {
 
 .footer__line {
   display: flex;
-  justify-content:space-between;
+  
+
 }
 
 .footer_author {
@@ -50,6 +51,6 @@ export default {
   color: white;
   padding: 0 10px;
   background: red;
- 
+  margin-left: auto;
 }
 </style>

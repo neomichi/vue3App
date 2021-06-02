@@ -1,29 +1,31 @@
-import {Helper} from "./helper";
+import {helper} from "./helper";
 
 
 const  store = window.localStorage;
 const key= "refreshToken"
   
-export  class RefreshToken  {
- private static store = window.localStorage;
- private static key= "refreshToken"
+  class RefreshToken  {
+ private readonly  store = window.localStorage;
+ private readonly  key= "refreshToken"
 
 
-
- public static get=()=> {
+ public  get=()=> {
   let result =store.getItem(key)
 
-  if (Helper.stringIsNullOrEmpty(result)) {
+  if (helper.stringIsNullOrEmpty(result)) {
     result="";
   } 
   return result
 }
 
-public static set=(value:string|undefined):void=> {   
-  if (!Helper.stringIsNullOrEmpty(value)) store.setItem(key,value as string)
+public  set=(value:string|undefined):void=> {   
+
+  if (!helper.stringIsNullOrEmpty(value)) store.setItem(key,value as string)
  
 }
 
-public static remove=()=>store.removeItem(key)
+public  remove=()=>store.removeItem(key)
 
 }
+
+export const refreshToken=new RefreshToken();

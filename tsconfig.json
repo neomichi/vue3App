@@ -33,7 +33,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx",
+    "tests/**/*.tsx", "src/store/custom2.ts3", "src/pinia/mainStore.ts",
     
   ],
   "exclude": [

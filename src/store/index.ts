@@ -1,44 +1,47 @@
 
-import { User  } from '../assets/code/user';
+import { user  } from '../assets/code/user';
 import { createStore } from "vuex";
-import { Helper } from "../assets/code/helper";
-import {RefreshToken} from "../assets/code/refreshToken";
+import { helper } from "../assets/code/helper";
+import {refreshToken} from "../assets/code/refreshToken";
 import axios from "axios";
 import { IResponseToken } from "@/assets/code/types";
-import {Toast} from "../assets/code/toast"
+import {toast} from "../assets/code/toast"
 
 //  export const createStore = () => {
 //   const state = reactive({ counter: 0 });
 //   const increment = () => state.counter++;
 //   return { increment, state: readonly(state) };
 // }
-
+import {  ref,reactive,computed } from "vue";
 
 export default createStore({
-  state:  {
+  state:({
     accessToken: "",
     user: {}, 
-  },
+  }),
+
+
+
+  
   getters: {
-    userRole: (state) =>User.GetRole(state.user),
-    tokenIsEmpty: (state) => Helper.stringIsNullOrEmpty(state.accessToken),
-    userIsEmpty: (state) => Helper.objectIsNullOrEmpty(state.user),
+    
+    tokenIsEmpty: (state) => helper.stringIsNullOrEmpty(state.accessToken),
+    userIsEmpty: (state) => helper.objectIsNullOrEmpty(state.user),
   },
   mutations: {
     setLoader(state, obj) {
       //state.showLoad = obj;
     },
     updateToken(state, obj:IResponseToken) {      
-      RefreshToken.set(obj.refreshToken);
-      state.accessToken = obj.accessToken;
-      
+      refreshToken.set(obj.refreshToken);
+      state.accessToken = obj.accessToken;      
     },
     setUser(state, obj) {
       console.log(obj)
       state.user = obj
     },
     logout(state) {
-      RefreshToken.set("")
+      refreshToken.set("")
       state.accessToken=""
       state.user = {};
     },
@@ -62,7 +65,7 @@ export default createStore({
         return true;
       } catch (error) {
         if (error.response == undefined) {
-          Toast.error("проблемы с сетью")
+          toast.error("проблемы с сетью")
         
         }
         console.log(`error ${error.response}`);
@@ -78,20 +81,20 @@ export default createStore({
         });
         commit("setUser", user.data);
         if (obj.showToast) {
-          Toast.success("Вы вошли в аккаунт")          
+          toast.success("Вы вошли в аккаунт")          
         }
         return true;
       } catch (e) {
         console.log(e);
         if (obj.showToast) {
-          Toast.error("Ошибка, войдите в аккаунт ");
+          toast.error("Ошибка, войдите в аккаунт ");
         }
         return false;
       }
     },
     logout({ commit }, showToast) {
       console.log(`logut ${showToast}`);
-      if (showToast) Toast.info("Вы вышли из аккаунта ");
+      if (showToast) toast.info("Вы вышли из аккаунта ");
       commit("logout");
     },
  
@@ -111,4 +114,5 @@ export default createStore({
     },
   },
   modules: {},
+  
 });

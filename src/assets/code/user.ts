@@ -1,10 +1,12 @@
+import { authStore } from "./../../store/authStore";
 import { AxiosError, AxiosResponse } from "axios";
 import { AxiosRepository } from "./axiosHelper";
-import { Helper } from "./helper";
-import { Toast } from "./toast";
+import { helper } from "./helper";
+import { toast } from "./toast";
 import store from "../../store/index";
-import {  IResponseToken, IUserForm } from "./types";
-
+import { IResponseToken, IUserForm } from "./types";
+import router from "@/router";
+import { ILoginForm, IRegisterForm } from "./types";
 
 export enum UserRole {
   admin = 30,
@@ -13,61 +15,76 @@ export enum UserRole {
   default = 0,
 }
 
+class User {
+  public "email": string;
+  public "roles": string;
 
+  public  GetRoleEnum = () => UserRole;
 
-
-export class User {
-  public static GetRole = (userState:{}): number => {
-  //    if (Helper.objectIsNullOrEmpty(userState.value.value)) return 0;
-
-    const userRole = Helper.objectKeyValue(userState, "roles");
+  public  GetRole = (userState: {}): number => {
+    const userRole = helper.objectKeyValue(userState, "roles");
     const result = UserRole[userRole as keyof typeof UserRole] as number;
-    return  result === undefined ? UserRole.default : result  
+    return result === undefined ? UserRole.default : result;
   };
 
-  public static GetUserFromToken = (
+  public  GetRoleRaw = (userObj: any) => {
+    const rawRole = helper.objectKeyValue(userObj, "roles");
+    const result = UserRole[rawRole as keyof typeof UserRole] as number;
+    return result === undefined ? UserRole.default : result;
+  };
+
+  public  RedirectToMainOrReturnUrl = function(returnUrl: string) {
+    if (helper.stringIsNullOrEmpty(returnUrl)) {
+      router.push("{name:'main'}");
+    } else {
+      console.log(returnUrl);
+    }
+  };
+
+  public GetUserFromToken = (
     accessToken: string,
     IsShow: boolean = false
   ) => {
-    if (!Helper.stringIsNullOrEmpty(accessToken)) {
+    if (!helper.stringIsNullOrEmpty(accessToken)) {
       AxiosRepository.Get("/account", accessToken)
         .then((response) => {
           const state = response as AxiosResponse;
-          if (!Helper.stringIsNullOrEmpty(state.data)) {
-            console.log()
-            store.commit("setUser", state.data);
-            if (IsShow) Toast.success("Успешно");
+          if (!helper.stringIsNullOrEmpty(state.data)) {
+            authStore.setUser(state.data);
+            //store.commit("setUser", state.data);
+            if (IsShow) toast.success("Успешно");
           }
-        })
+        }).finally(() => console.log('finally GetUserFromToken'))
         .catch((error: AxiosError) => {
           console.log(error);
-          if (IsShow) Toast.error("Ошибка");
+          if (IsShow) toast.error("Ошибка");
         });
     }
   };
 
-  public static LoginResult = (userForm: IUserForm) => {
-    AxiosRepository.Post("/token", userForm, "")
+  public LoginForm = (userForm: ILoginForm) => {
+    AxiosRepository.Put("/account", userForm, "")
       .then((response) => {
         const axiosResponse = response as AxiosResponse;
         const responseToken: IResponseToken = axiosResponse.data;
         try {
           if (
-            !Helper.stringIsNullOrEmpty(responseToken.accessToken) &&
-            !Helper.stringIsNullOrEmpty(responseToken.refreshToken)
+            !helper.stringIsNullOrEmpty(responseToken.accessToken) &&
+            !helper.stringIsNullOrEmpty(responseToken.refreshToken)
           ) {
-            store.commit("updateToken", responseToken);
-
-            User.GetUserFromToken(responseToken.accessToken, true);
+            // store.commit("updateToken", responseToken);
+            authStore.updateToken(responseToken);
+            user.GetUserFromToken(responseToken.accessToken, true);
           } else throw new Error("Something went wrong :(");
         } catch {
-          Toast.warning("Вы yказали неверный данные");
+          toast.warning("Вы yказали неверный данные");
         }
       })
-      .catch(() => Toast.error("Ошибка"));
+      .finally(() => console.log('finally LoginForm'))
+      .catch(() => toast.error("Ошибка"));
   };
 
-  public static RegisterResult = (userForm: IUserForm) => {
+  public RegisterForm = (userForm: IRegisterForm) => {
     AxiosRepository.Post("/account", userForm, "")
       .then((response) => {
         const state = response as AxiosResponse;
@@ -76,16 +93,21 @@ export class User {
           const refreshToken: string = state.data.refreshToken;
           const responseToken = state.data as IResponseToken;
           if (
-            !Helper.stringIsNullOrEmpty(accessToken) &&
-            !Helper.stringIsNullOrEmpty(refreshToken)
+            !helper.stringIsNullOrEmpty(accessToken) &&
+            !helper.stringIsNullOrEmpty(refreshToken)
           ) {
             store.commit("updateToken", { accessToken, refreshToken });
-            User.GetUserFromToken(accessToken, true);
+
+            user.GetUserFromToken(accessToken, true);
           } else throw new Error("Something bad create");
         } catch {
-          Toast.warning("Вы yказали неверный данные");
+          toast.warning("Вы yказали неверный данные");
         }
       })
-      .catch(() => Toast.error("Ошибка"));
+      .finally(() => console.log('finally RegisterForm'))
+      .catch(() => toast.error("Ошибка"));
   };
 }
+
+
+export const user=new User()

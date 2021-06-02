@@ -1,13 +1,9 @@
 <template>
   <div class="center">
-
     <div class="userform__container">
-      <form  id="auth" class="userform" @submit.prevent="formResult">
-
-        
-        <div class="userform__header">{{ formTitle }}</div>
+      <form id="auth" class="userform" @submit.prevent="formResult">
+        <div class="userform__header">{{ pageData.Title }}</div>
         <div class="userform__body">
-       
           <div class="userform__input field">
             <div class="userform__input__icon">*</div>
             <label class="userform-label" for="email">email</label>
@@ -35,9 +31,12 @@
               v-model="userForm.password"
             />
           </div>
-          <div v-if="routeName == 'register'" class="userform__input field">
+          <div></div>
+          <div v-if="!pageData.LoginPage" class="userform__input field">
             <div class="userform__input__icon">*</div>
-            <label class="userform-label" for="repassword">повторить пароль</label>
+            <label class="userform-label" for="repassword"
+              >повторить пароль</label
+            >
             <input
               type="password"
               name="repassword"
@@ -54,131 +53,129 @@
             </label>
           </div>
         </div>
-        <div class="userform__button">   
-            
-         {{routeNameUpdate()}}
-          <button v-if="isLoginPage"  class="button is-active">
-            войти  
-          </button>
-          <button v-if="!isLoginPage" class="button is-active">
-            регистрация
-          </button>
-          <i class="fa fa-sign-in" aria-hidden="true"></i>
+        <div class="userform__button">
+          <div>
+           
+          </div>
+          <matherialButton
+            :title="pageData.SubmitTitle"
+            :buttonClick="onSubmit"
+          ></matherialButton>
         </div>
         <div class="userform__about">
-         <p v-if="isLoginPage">У вас нет аккаунта,  <router-link :to="{name:'register'}"  tag="a"> регистрация</router-link> </p>
-          <p v-if="!isLoginPage">У вас есть аккаунт,  <router-link :to="{name:'login'}"  tag="a"> войти </router-link> </p> 
+          <p v-if="pageData.LoginPage">
+            Ещё нет аккаунта?
+            <router-link :to="{ name: 'register' }" tag="a">
+              Зарегистрируйтесь</router-link
+            >
+          </p>
+          <p v-if="!pageData.LoginPage">
+            есть аккаунт?,
+            <router-link :to="{ name: 'login' }" tag="a"> Войти </router-link>
+          </p>
         </div>
-     
       </form>
     </div>
-
   </div>
 </template>
 <script lang="ts">
-import route from "../router/index"
-import store from "../store/index"
+import route from "../router/index";
+import store from "../store/index";
+import matherialButton from "@/components/form/matherialButton.vue";
 
-import { defineComponent, ref, reactive, computed,onMounted } from "vue";
-import { Toast } from "../assets/code/toast";
-import { AxiosRepository } from "@/assets/code/axiosHelper";
-import { AxiosResponse } from "axios";
-import { IUserForm, IResponseToken } from "../assets/code/types";
-import { Helper } from "@/assets/code/helper";
-import { User} from '@/assets/code/user'
+import {
+  defineComponent,
+  ref,
+  reactive,
+  computed,
+  onMounted,
+  onUpdated,
+  onBeforeUpdate,
+} from "vue";
 
-
+import { ILoginForm, IUserForm, IRegisterForm } from "../assets/code/types";
+import { user } from "@/assets/code/user";
+import { authStore } from "@/store/authStore";
+import { extend } from "@vue/shared";
 
 export default defineComponent({
+  components: {
+    matherialButton,
+  },
   setup() {
-     onMounted(() => {      
-      console.log("auth Mounted");
-    })
-    computed(()=>{
-       store.getters.userRole.roles
-       console.log(`computed user ${store.getters.userRole}`)
-    })
-     const isLoginPage=ref(false)
+    function onSubmit() {
+      console.log("onSubmit");
+      const LoginForm: ILoginForm ={
+      email: userForm.email,
+      password: userForm.password,
+      saveToLong: userForm.saveToLong      
+      }
 
-     let routeName = ref(route.currentRoute.value.name)
-    
-     function routeNameUpdate() {
-       if(route.currentRoute.value.name === "login") isLoginPage.value=true;
-       if(route.currentRoute.value.name === "register") isLoginPage.value=false;
-        routeName.value=route.currentRoute.value.name; ///костыль 
-     }
-     const formTitle=ref(computed(() => isLoginPage.value?"Войти":"Регистрация"))
-    
-    const userForm:IUserForm = reactive({
+      
+    const RegisterForm: IRegisterForm={
+      email: userForm.email,
+      password: userForm.password,
+      repassword: userForm.repassword,
+      isAgree: userForm.isAgree
+    }
+///button close
+      if (pageData.value.LoginPage) {
+        var hh=user.LoginForm(LoginForm)
+        console.log(hh)
+      } else {
+        user.RegisterForm(RegisterForm)
+      }
+///button close
+      //dataValid()
+      //if (routeName()==true)
+    }
+
+    onMounted(() => {
+      console.log("auth Mounted");
+    });
+
+    let computedData = reactive(
+      computed(() => {
+        if (store.getters.userRole > 0) {
+          user.RedirectToMainOrReturnUrl("");
+        }
+        console.log(`computed user ${store.getters.userRole}`);
+        console.log(`route `);
+        console.log(route.currentRoute.value.name);
+      })
+    );
+
+    let pageData = reactive(
+      computed(() => {
+        let loginPage = route.currentRoute.value.name == "login" ? true : false;
+        return {
+          Title: loginPage ? "Войти" : "Регистрация",
+          SubmitTitle: loginPage ? "Войти" : "Регистрация",
+          LoginPage: loginPage,
+        };
+      })
+    );
+
+    const userForm: IUserForm = reactive({
       email: "admin@test.ru1",
       password: "LikeMe123!",
       saveToLong: true,
       repassword: "",
       isAgree: true,
-    });  
+    });
 
-    function formResult() {
-        if (isLoginPage.value) User.LoginResult(userForm);
-         else User.RegisterResult(userForm)
-    }
    
 
-    // const RegisterResult=()=> {
-    //   AxiosRepository.Post("/account", userForm, "")
-    //     .then((response) => {
-    //       const state = response as AxiosResponse;
-    //       try {
-    //         const accessToken:string = state.data.accessToken;
-    //         const refreshToken:string= state.data.refreshToken;
-    //         const responseToken=state.data as ResponseToken
-    //         if (
-    //           !Helper.stringIsNullOrEmpty(accessToken) &&
-    //           !Helper.stringIsNullOrEmpty(refreshToken)
-    //         ) {       
-                
-    //           store.commit("updateToken", { accessToken, refreshToken });
-    //           User.GetUserFromToken(accessToken,true)
-    //         } else throw new Error('Something bad create');
-    //       } catch {
-            
-    //         Toast.warning("Вы yказали неверный данные");
-            
-    //       }
-    //     })
-    //     .catch(() => Toast.error("Ошибка")); 
-    // }
-  
-    // const LoginResult = () => {
-    //   AxiosRepository.Post("/token", userForm, "")
-    //     .then((response) => {
-    //       const axiosResponse = response as AxiosResponse;
-    //       try {
-    //         const accessToken:string = axiosResponse.data.accessToken;
-    //         const refreshToken:string= axiosResponse.data.refreshToken;
-       
-    //         if (
-    //           !Helper.stringIsNullOrEmpty(accessToken) &&
-    //           !Helper.stringIsNullOrEmpty(refreshToken)
-    //         ) {       
-                    
-    //           store.commit("updateToken", { accessToken, refreshToken });
-              
-    //           User.GetUserFromToken(accessToken,true)
-    //         } else throw new Error('Something went wrong :(')
-    //       } catch {
-            
-    //         Toast.warning("Вы yказали неверный данные");
-    //       }
-    //     })
-    //     .catch(() => Toast.error("Ошибка"));      
-    // };
- 
 
+    const formResult = function() {
+      return;
+    };
 
-    return {formResult, formTitle, routeName,userForm,routeNameUpdate,isLoginPage };
+    return { formResult, pageData, computedData, userForm, onSubmit };
   },
 });
 </script>
+
 <style lang="scss">
 .userform {
   padding: 20px 30px;
@@ -193,7 +190,11 @@ export default defineComponent({
     display: block;
     font-size: 1rem;
   }
-
+  &__about {
+    &-p {
+      margin-left: auto;
+    }
+  }
   &__body {
     padding: 10px 0;
   }

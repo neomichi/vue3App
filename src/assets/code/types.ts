@@ -1,11 +1,15 @@
 import { RouteRecordRaw } from 'vue-router';
-//токетXXX
+interface LoginRegisterPage{
+  key: string;
+  value: string|number|boolean;
+}
 
 export interface IRole {
   roles: string | undefined | null;
 }
 
-export interface IUserForm {
+
+export interface IUserForm extends ILoginForm,IRegisterForm {
   email: string,
   password: string,
   saveToLong: boolean,
@@ -25,7 +29,6 @@ export interface IRegisterForm {
   repassword: string,
   isAgree: boolean
 }
-
 
 export interface IResponseToken {
   accessToken:string 
@@ -49,6 +52,7 @@ export  enum PageType {
   register=20,
   user=30
 }
+
 
 
 

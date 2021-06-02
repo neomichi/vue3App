@@ -22,7 +22,11 @@ export default defineComponent({
     placeholder:{type:String,default:""}
   },
   setup() {
-    return {}
+    function onInput() {
+      console.log(1)
+    }
+    return {onInput}
+    
   }
 })
 </script>

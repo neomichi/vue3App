@@ -21,42 +21,47 @@
           <router-link tag="a" class="nav-router-link" :to="{ name: item.name }"
             >{{ item.title }}
           </router-link>
-        </li>
-
+        </li>     
         <div class="animation start-home"></div>
         <div class="nav__userlogo"></div>
-      </ul>
-      {{userRole}}
+      </ul>    
     </div>
 
   </nav>
 </template>
 <script lang="ts">
 import routes from "../router/index"
-import store from "../store/index"
+
 import { RouteRecordNormalized } from 'vue-router'
 
-import { defineComponent, ref ,computed,watchEffect} from "vue";
+import { defineComponent, ref ,computed} from "vue";
+import { authStore } from '@/store/authStore';
+
 
 export default defineComponent({
   setup() {
     const routeName = "";
-    const userRole=
-    computed(()=>{
-       store.getters.userRole
-       console.log(`computed ${store.getters.userRole}`)
-    })
+    const userRole=computed(()=>authStore.getUserRole());
+
   
   
     const userImg = ref("user.png");  
-    function  isAllowRoute(route:RouteRecordNormalized):boolean {
-     
-       return true
-     }  
+    function isAllowRoute(route:RouteRecordNormalized):boolean { 
+        return parseInt(route.meta.role)>=userRole.value
+    }  
+    function isDenyAuth(route:RouteRecordNormalized):boolean {
+      const result= userRole.value>0
+
+       const r2=(route.name=="register" || route.name=="login")
+      console.log(`-${r2}---${result}`)
+      return result&&r2?false:true;
+    }
     const menuRoutes = routes      
       .getRoutes()      
+      .filter((route)=>isAllowRoute(route))      
       .filter((route) => route.meta.showInMenu)
-      .filter((route)=>isAllowRoute(route))
+  
+      
       .map((route) => {
          return {
           name: route.name,

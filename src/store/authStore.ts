@@ -1,8 +1,8 @@
 
-import { reactive,ref } from 'vue';
+import { ref } from 'vue';
 import { Helper } from './../assets/code/helper';
 
-import { User, UserRole } from './../assets/code/user';
+import {  UserRole } from './../assets/code/user';
 import { RefreshToken } from "@/assets/code/refreshToken";
 import { IResponseToken } from "@/assets/code/types";
 import { Store } from "./MyStore";
@@ -26,7 +26,7 @@ class AuthStore extends Store<Auth> {
   }
   setUser(obj: any) {
     console.log(obj);
-    this.state.user = obj;
+    this.state.user = obj;    
   }
 
   logout() {    
@@ -41,7 +41,7 @@ class AuthStore extends Store<Auth> {
     
     const rawRole=Helper.objectKeyValue(this.state.user,"roles")
     const role = UserRole[rawRole as keyof typeof UserRole] as number;
-    return  role===undefined?result.value=0:result.value=role;   
+    return role===undefined?result.value=0:result.value=role;   
 
   }
 

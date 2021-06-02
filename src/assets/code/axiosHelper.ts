@@ -1,7 +1,8 @@
+import { Toast } from './toast';
 
 import { Helper } from "./helper";
 import axios from "axios";
-import {  AxiosRequestConfig, Method } from "axios";
+import {  AxiosRequestConfig, Method,AxiosError } from "axios";
 
 
 // const apiClient = axios.create({
@@ -34,18 +35,16 @@ export class AxiosRepository {
 
         if (!Helper.stringIsNullOrEmpty(AccessToken)) {
             // {'Authorization': `Bearer ${AccessToken}`};
-            config.headers['Authorization']=`Bearer ${AccessToken}`
-
-           
+            config.headers['Authorization']=`Bearer ${AccessToken}`          
            
         }
    
         return new Promise((resolve, reject)=> {
-            
+
             AxiosRepository.apiClient(url, config)
                 //.get(url,cfg(AccessToken))
                 .then((response) => resolve(response))
-                .catch((error) => reject(error.response));
+                .catch((error:AxiosError) => reject(error)); 
         });
     }
     public static Get(url:string,accessToken="") {

@@ -1,14 +1,15 @@
 <template>
   <div>
+    <h1>test Suspense</h1>
+    <div>
     <Suspense>
-      <Suspensetest />
+      <Suspensetest    />
     </Suspense>
-
-
+  </div>
   <Suspense>
     <template #default>
       <div>
-        <h1>test Suspense</h1>
+        <h1>default Suspense</h1>
         <div>
           <Suspensetest />
         </div>
@@ -30,7 +31,11 @@ export default defineComponent({
     Suspensetest,
   },
   setup() {
-    return {};
+    function cc(ev:any) {
+       console.log(ev)
+    }
+
+    return {cc};
   },
 });
 </script>
